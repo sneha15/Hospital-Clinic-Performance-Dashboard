@@ -1,0 +1,6 @@
+my-sql-connector-python=9.2.0
+mysqlworkbench = 8.0.33
+SQLAlchemy = 2.0.38
+streamlit = 1.42.0
+mysqlclient = 2.2.7
+streamlit = 1.12.0
