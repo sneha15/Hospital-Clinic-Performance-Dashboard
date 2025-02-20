@@ -20,6 +20,7 @@ FROM synthetic_data_jan_2025;
 # VALUES ('2025-01-31 01:00:00', 'Memory Clinic', 1.0, 0, 5, 4.9);  
 
 # Edit values in data
-# UPDATE synthetic_data_jan_2025
-# SET satisfaction_score = 1.0
+UPDATE synthetic_data_jan_2025
+SET satisfaction_score = 4.3
+WHERE id = 1;
 # WHERE time_of_day = '2025-01-31 00:00:00' AND department = 'Memory Clinic';
