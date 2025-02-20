@@ -1,0 +1,6 @@
+[theme]
+primaryColor = "#4CAF50"  # Change primary button color (green)
+backgroundColor = "#00172B"  # Light grey background
+secondaryBackgroundColor = "#E0E0E0"  # Sidebar background
+textColor = "#FFF"  # Dark grey text
+font = "sans serif"  # Available options: sans serif, serif, monospace
