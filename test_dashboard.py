@@ -62,11 +62,21 @@ st.title("📊 Clinic Performance Dashboard")
 st.markdown("---")
 
 # Key Metrics
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Avg Wait Time", f"{filtered_data['wait_time'].mean():.2f} min")
+st.subheader("Key Metrics")
+col1, col2, col3, col4, col5 = st.columns(5)
+col1.metric("Avg Wait Time", f"{filtered_data['wait_time'].mean():.1f} min")
 col2.metric("Avg Patients Waiting", f"{filtered_data['patients_waiting'].mean():.2f}")
 col3.metric("Avg Doctors Available", f"{filtered_data['doctors_available'].mean():.2f}")
 col4.metric("Avg Satisfaction Score", f"{filtered_data['satisfaction_score'].mean():.2f}")
+col5.metric("Peak Wait Time", f"{filtered_data['wait_time'].max()} min")
+
+# More insights
+busiest_hour = filtered_data.groupby("hour")["patients_waiting"].sum().idxmax()
+least_busy_hour = filtered_data.groupby("hour")["patients_waiting"].sum().idxmin()
+
+st.subheader("Additional Insights")
+st.write(f"**Busiest Hour:** {busiest_hour}:00")
+st.write(f"**Least Busy Hour:** {least_busy_hour}:00")
 
 st.markdown("---")
 

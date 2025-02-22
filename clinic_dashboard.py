@@ -5,25 +5,71 @@ from clinic_data import get_clinic_data # Import the data fetching function
 
 
 def show_page():
-    st.title("📊 Clinic Dashboard")
-    st.write("Welcome to the Clinic Dashboard!")
+    #st.title("📊 Clinic Dashboard")
+
+    # Set sidebar color and style using CSS
+    st.markdown(
+        """
+        <style>
+            /* Sidebar text color and size */
+            [data-testid="stSidebar"] div[role="radiogroup"], 
+            [data-testid="stSidebar"] label {
+                color: #000000 !important; /* Change text color (white) */
+                font-size: 10px !important; /* Change font size */
+            }
+
+            /*Target slider labels*/
+            [data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] p{
+                font-size: 20px !important;
+            }
+
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
     # Live update section
     while True:
-        
+
         # Fetch the latest data
-        (clinic_data_table, clinic_data_df) = get_clinic_data()
+        (clinic_data_table, clinic_data) = get_clinic_data()
 
-        # Display key metrics
-        #total_patients = clinic_data_df["patients_waiting"].sum()
-        #avg_wait_time = clinic_data_df["wait_time"].mean()
-        #avg_satisfaction = clinic_data_df["satisfaction_score"].mean()
+        # Convert date column
+        clinic_data['time_of_day'] = pd.to_datetime(clinic_data['time_of_day'])
+        clinic_data["hour"] = clinic_data["time_of_day"].dt.hour 
 
-        # Create a metric display
-        #col1, col2, col3 = st.columns(3)
-        #col1.metric("Total Patients Waiting", total_patients)
-        #col2.metric("Avg. Wait Time (mins)", f"{avg_wait_time:.2f}")
-        #col3.metric("Avg. Satisfaction Score", f"{avg_satisfaction:.1f}")
+        # Sidebar filters
+        departments = clinic_data['department'].unique()
+        selected_department = st.sidebar.multiselect("Select Department", departments, default=departments)
+        date_range = st.sidebar.date_input("Select Date Range", [clinic_data['time_of_day'].min(), clinic_data['time_of_day'].max()])
+
+        # Filter data
+        filtered_data = clinic_data[(clinic_data['department'].isin(selected_department)) &
+                            (clinic_data['time_of_day'].between(pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])))]
+
+        # Layout
+        st.title("📊 Clinic Performance Dashboard")
+        st.write("Welcome to the Clinic Dashboard!")
+        st.markdown("---")
+
+        # Key Metrics
+        st.subheader("Key Metrics")
+        col1, col2, col3, col4, col5 = st.columns(5)
+        col1.metric("Avg Wait Time", f"{filtered_data['wait_time'].mean():.1f} min")
+        col2.metric("Avg Patients Waiting", f"{filtered_data['patients_waiting'].mean():.2f}")
+        col3.metric("Avg Doctors Available", f"{filtered_data['doctors_available'].mean():.2f}")
+        col4.metric("Avg Satisfaction Score", f"{filtered_data['satisfaction_score'].mean():.2f}")
+        col5.metric("Peak Wait Time", f"{filtered_data['wait_time'].max()} min")
+
+        # More insights
+        busiest_hour = filtered_data.groupby("hour")["patients_waiting"].sum().idxmax()
+        least_busy_hour = filtered_data.groupby("hour")["patients_waiting"].sum().idxmin()
+
+        st.subheader("Additional Insights")
+        st.write(f"**Busiest Hour:** {busiest_hour}:00")
+        st.write(f"**Least Busy Hour:** {least_busy_hour}:00")
+
+        st.markdown("---")
 
         # Wait 20 seconds before refreshing
         interval = 20
