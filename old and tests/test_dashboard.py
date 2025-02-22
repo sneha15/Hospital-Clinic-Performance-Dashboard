@@ -36,7 +36,7 @@ def load_data():
         password=db_config["password"],
         database=db_config["database"]
     )
-    query = "SELECT * FROM synthetic_data_jan_2025"
+    query = "SELECT * FROM synthetic_data_jan_2025 ORDER BY time_of_day"
     df = pd.read_sql(query, conn)
     conn.close()
     return df
@@ -47,6 +47,7 @@ clinic_data = load_data()
 # Convert date column
 clinic_data['time_of_day'] = pd.to_datetime(clinic_data['time_of_day'])
 clinic_data["hour"] = clinic_data["time_of_day"].dt.hour 
+clinic_data["date"] = clinic_data["time_of_day"].dt.date
 
 # Sidebar filters
 departments = clinic_data['department'].unique()
@@ -55,8 +56,9 @@ date_range = st.sidebar.date_input("Select Date Range", [clinic_data['time_of_da
 
 # Filter data
 filtered_data = clinic_data[(clinic_data['department'].isin(selected_department)) &
-                            (clinic_data['time_of_day'].between(pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])))]
-
+                            (clinic_data['time_of_day'] >= pd.to_datetime(date_range[0])) &
+                            (clinic_data['time_of_day'] < pd.to_datetime(date_range[1]))]
+                             
 # Layout
 st.title("📊 Clinic Performance Dashboard")
 st.markdown("---")
@@ -81,26 +83,42 @@ st.write(f"**Least Busy Hour:** {least_busy_hour}:00")
 st.markdown("---")
 
 # Visualizations
+# Line Chart: Wait Time Trend
 st.subheader("📈 Wait Time Over Time")
 fig1 = px.line(filtered_data, x='time_of_day', y='wait_time', color='department', title="Wait Time Trend")
 st.plotly_chart(fig1, use_container_width=True)
 
-st.subheader("📊 Satisfaction Score Distribution")
-fig2 = px.box(filtered_data, x='department', y='satisfaction_score', title="Satisfaction Score by Department")
+# Bar Chart: Average Wait Time by Day
+st.subheader("📊 Average Wait Time per day")
+fig2 = px.bar(filtered_data.groupby("date")["wait_time"].mean().reset_index(), x="date", y="wait_time", title="Average Wait Time per Day")
 st.plotly_chart(fig2, use_container_width=True)
 
-st.subheader("🔍 Patients Waiting & Doctors Available")
-fig3 = px.bar(filtered_data, x='time_of_day', y=['patients_waiting', 'doctors_available'], barmode='group', title="Patients vs Doctors Over Time")
+# Line Chart: Satisfaction Score Trend
+st.subheader("📈 Satisfaction Score Over Time")
+fig3 = px.line(filtered_data, x='time_of_day', y='satisfaction_score', color='department', title="Satisfaction Score Trend")
 st.plotly_chart(fig3, use_container_width=True)
 
-st.subheader("🕒 Heatmap of Wait Times")
-fig4 = px.density_heatmap(filtered_data, x='hour', y='department', z='wait_time', histfunc='avg', title="Wait Time by Hour")
+# Box Plot: Satisfaction Score Distribution
+st.subheader("📊 Satisfaction Score Distribution")
+fig4 = px.box(filtered_data, x='department', y='satisfaction_score', title="Satisfaction Score by Department")
 st.plotly_chart(fig4, use_container_width=True)
 
-st.subheader("📌 Scatter Plot: Wait Time vs Satisfaction Scores")
-fig5 = px.scatter(filtered_data, x='wait_time', y='satisfaction_score', color='department', title="Wait Time vs Satisfaction")
+# Bar Chart: Patients Waiting and Doctor Availability
+st.subheader("🔍 Patients Waiting & Doctors Available")
+fig5 = px.bar(filtered_data, x='time_of_day', y=['patients_waiting', 'doctors_available'], barmode='group', title="Patients vs Doctors Over Time")
 st.plotly_chart(fig5, use_container_width=True)
 
-st.subheader("📊 Patients Distribution Across Clinics")
-fig6 = px.pie(filtered_data, names='department', values='patients_waiting', title="Patients Waiting per Clinic")
+# Heatmap of wait times per hour per department
+st.subheader("🕒 Heatmap of Wait Times")
+fig6 = px.density_heatmap(filtered_data, x='hour', y='department', z='wait_time', histfunc='avg', color_continuous_scale="Hot", title="Wait Time by Hour")
 st.plotly_chart(fig6, use_container_width=True)
+
+# Scatter Plot: Wait Time vs Satisfaction Scores
+st.subheader("📌 Scatter Plot: Wait Time vs Satisfaction Scores")
+fig7 = px.scatter(filtered_data, x='wait_time', y='satisfaction_score', color='department', title="Wait Time vs Satisfaction")
+st.plotly_chart(fig7, use_container_width=True)
+
+# Pie chart of patient distribution across clinics
+st.subheader("📊 Patients Distribution Across Clinics")
+fig8 = px.pie(filtered_data, names='department', values='patients_waiting', title="Patients Waiting per Clinic")
+st.plotly_chart(fig8, use_container_width=True)

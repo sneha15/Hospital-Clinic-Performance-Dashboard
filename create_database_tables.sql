@@ -16,8 +16,12 @@ SELECT *
 FROM synthetic_data_jan_2025;
 
 # Add values to the data
-# INSERT INTO synthetic_data_jan_2025 (time_of_day, department, wait_time, patients_waiting, doctors_available, satisfaction_score) 
-# VALUES ('2025-01-31 01:00:00', 'Memory Clinic', 1.0, 0, 5, 4.9);  
+INSERT INTO synthetic_data_jan_2025 (id, time_of_day, department, wait_time, patients_waiting, doctors_available, satisfaction_score) 
+VALUES (2164, '2025-01-31 01:00:00', 'Memory Clinic', 1.0, 0, 5, 4.9);  
+
+# Delete values from the data
+DELETE FROM synthetic_data_jan_2025
+WHERE id = 2164;
 
 # Edit values in data
 UPDATE synthetic_data_jan_2025

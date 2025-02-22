@@ -6,10 +6,3 @@ mysqlclient = 2.2.7
 mysql-connector-python = 9.2.0
 streamlit-option-menu = 0.4.0
 
-# in base file
-# mysql-connector-python=9.2.0
-# SQLAlchemy = 1.4.22
-# mysqlclient = 2.2.7
-# streamlit = 1.12.0
-# 
-

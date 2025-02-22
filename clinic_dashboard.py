@@ -1,12 +1,11 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 import time
 from clinic_data import get_clinic_data # Import the data fetching function
 
 
 def show_page():
-    #st.title("📊 Clinic Dashboard")
-
     # Set sidebar color and style using CSS
     st.markdown(
         """
@@ -37,6 +36,7 @@ def show_page():
         # Convert date column
         clinic_data['time_of_day'] = pd.to_datetime(clinic_data['time_of_day'])
         clinic_data["hour"] = clinic_data["time_of_day"].dt.hour 
+        clinic_data["date"] = clinic_data["time_of_day"].dt.date
 
         # Sidebar filters
         departments = clinic_data['department'].unique()
@@ -45,7 +45,8 @@ def show_page():
 
         # Filter data
         filtered_data = clinic_data[(clinic_data['department'].isin(selected_department)) &
-                            (clinic_data['time_of_day'].between(pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])))]
+                            (clinic_data['time_of_day'] >= pd.to_datetime(date_range[0])) &
+                            (clinic_data['time_of_day'] < pd.to_datetime(date_range[1]))]
 
         # Layout
         st.title("📊 Clinic Performance Dashboard")
@@ -71,22 +72,51 @@ def show_page():
 
         st.markdown("---")
 
+        # Visualizations
+        # Line Chart: Wait Time Trend
+        st.subheader("📈 Wait Time Over Time")
+        fig1 = px.line(filtered_data, x='time_of_day', y='wait_time', color='department', title="Wait Time Trend")
+        st.plotly_chart(fig1, use_container_width=True)
+
+        # Bar Chart: Average Wait Time by Day
+        st.subheader("📊 Average Wait Time per day")
+        fig2 = px.bar(filtered_data.groupby("date")["wait_time"].mean().reset_index(), x="date", y="wait_time", title="Average Wait Time per Day")
+        st.plotly_chart(fig2, use_container_width=True)
+
+        # Line Chart: Satisfaction Score Trend
+        st.subheader("📈 Satisfaction Score Over Time")
+        fig3 = px.line(filtered_data, x='time_of_day', y='satisfaction_score', color='department', title="Satisfaction Score Trend")
+        st.plotly_chart(fig3, use_container_width=True)
+
+        # Box Plot: Satisfaction Score Distribution
+        st.subheader("📊 Satisfaction Score Distribution")
+        fig4 = px.box(filtered_data, x='department', y='satisfaction_score', title="Satisfaction Score by Department")
+        st.plotly_chart(fig4, use_container_width=True)
+
+        # Bar Chart: Patients Waiting and Doctor Availability
+        st.subheader("🔍 Patients Waiting & Doctors Available")
+        fig5 = px.bar(filtered_data, x='time_of_day', y=['patients_waiting', 'doctors_available'], barmode='group', title="Patients vs Doctors Over Time")
+        st.plotly_chart(fig5, use_container_width=True)
+
+        # Heatmap of wait times per hour per department
+        st.subheader("🕒 Heatmap of Wait Times")
+        fig6 = px.density_heatmap(filtered_data, x='hour', y='department', z='wait_time', histfunc='avg', color_continuous_scale="Hot", title="Wait Time by Hour")
+        st.plotly_chart(fig6, use_container_width=True)
+
+        # Scatter Plot: Wait Time vs Satisfaction Scores
+        st.subheader("📌 Scatter Plot: Wait Time vs Satisfaction Scores")
+        fig7 = px.scatter(filtered_data, x='wait_time', y='satisfaction_score', color='department', title="Wait Time vs Satisfaction")
+        st.plotly_chart(fig7, use_container_width=True)
+
+        # Pie chart of patient distribution across clinics
+        st.subheader("📊 Patients Distribution Across Clinics")
+        fig8 = px.pie(filtered_data, names='department', values='patients_waiting', title="Patients Waiting per Clinic")
+        st.plotly_chart(fig8, use_container_width=True)
+
         # Wait 20 seconds before refreshing
         interval = 20
         time.sleep(interval)
         st.rerun()
-
-
-# Sidebar Filtering
-
-    # with st.sidebar:
-      #  st.header("🔍 Filter Options")
-       # department = st.selectbox("Select Department", ["All", "General", "Pediatrics", "Surgery"])
-       # date_range = st.date_input("Select Date Range", [])
-
-# Display Filtered Data
-#st.write(f"Showing results for Department: `{department}`")
-# st.write("Dashboard content will be here...")
 
 # min_wait_time = st.slider("Minimum Wait Time", 0, 120, 10)
 # filtered_data = data[data["Wait Time"] >= min_wait_time]
