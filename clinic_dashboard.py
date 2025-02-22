@@ -10,6 +10,7 @@ def show_page():
 
     # Live update section
     while True:
+        
         # Fetch the latest data
         (clinic_data_table, clinic_data_df) = get_clinic_data()
 

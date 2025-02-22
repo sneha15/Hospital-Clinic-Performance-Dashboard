@@ -1,6 +1,11 @@
 [theme]
-primaryColor = "#4CAF50"  # Change primary button color (green)
-backgroundColor = "#00172B"  # Light grey background
-secondaryBackgroundColor = "#E0E0E0"  # Sidebar background
-textColor = "#FFF"  # Dark grey text
-font = "sans serif"  # Available options: sans serif, serif, monospace
+# Change primary button color used for interactive elements, notably buttons, sliders (green)
+primaryColor = "#4CAF50"
+# Sets overall background of main content area of app where charts are displayed - dark blue  
+backgroundColor = "#00172B"  
+# Controls background color of sidebar - light grey
+secondaryBackgroundColor = "#E0E0E0"
+# Changes color of text in Streamlit app - white  
+textColor = "#FFF"  
+# Available options: sans serif, serif, monospace
+font = "sans serif"  
