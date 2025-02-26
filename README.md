@@ -40,6 +40,16 @@ To run this application locally, follow these steps:
     pip install -r requirements.txt
     ```
 
+3.  **Create a secrets.toml file:**
+   In .streamlit folder:
+    ```# .streamlit/secrets.toml
+    [mysql]
+    host = "localhost"
+    user = "root"
+    password = "your_password"
+    database = "hospital_data"
+    ```
+
 3.  **Run the App:**
     ```bash
     streamlit run app.py
