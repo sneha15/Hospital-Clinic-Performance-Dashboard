@@ -8,8 +8,8 @@ st.set_page_config(page_title="IMH Healthcare Dashboard", page_icon="🏥", layo
 with st.sidebar:
     selected = option_menu(
         menu_title="Home",
-        options=["Clinic Dashboard", "Clinic Data", "Patient Dashboard", "Patient Data"],
-        icons=["activity", "database", "clipboard-pulse", "table"],
+        options=["Clinic Dashboard", "Clinic Data"],
+        icons=["activity", "database"],
         menu_icon="house",
         default_index=0
     )
@@ -23,10 +23,3 @@ elif selected == "Clinic Data":
     import clinic_data
     clinic_data.show_page()
 
-elif selected == "Patient Dashboard":
-    import patient_dashboard
-    patient_dashboard.show_page()
-
-elif selected == "Patient Data":
-    import patient_data
-    patient_data.show_page()
