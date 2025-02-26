@@ -1,8 +1,8 @@
 # in virtual environment - use this
-streamlit  = 1.42.1
-SQLAlchemy  = 2.0.38
-pandas = 2.2.3
-mysqlclient = 2.2.7
-mysql-connector-python = 9.2.0
-streamlit-option-menu = 0.4.0
+streamlit==1.42.1
+SQLAlchemy==2.0.38
+pandas==2.2.3
+mysqlclient==2.2.7
+mysql-connector-python==9.2.0
+streamlit-option-menu==0.4.0
 
